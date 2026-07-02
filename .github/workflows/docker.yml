@@ -10,13 +10,13 @@ on:
   push:
     branches: [main]
     paths:
-      - bundle                              # submodule pointer (160000 tree entry)
+      - bundle # submodule pointer (160000 tree entry)
       - .github/workflows/docker.yml
   workflow_dispatch:
 
 permissions:
   contents: read
-  packages: write                           # push to ghcr.io
+  packages: write # push to ghcr.io
 
 jobs:
   docker:
@@ -26,7 +26,7 @@ jobs:
       - name: Checkout with recursive submodules
         uses: actions/checkout@v4
         with:
-          submodules: recursive             # bundle/ must be populated for the build
+          submodules: recursive # bundle/ must be populated for the build
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

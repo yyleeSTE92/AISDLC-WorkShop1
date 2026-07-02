@@ -8,11 +8,11 @@ name: Build bundle
 
 on:
   schedule:
-    - cron: '0 * * * *'   # every hour at :00 UTC
+    - cron: '0 * * * *' # every hour at :00 UTC
   workflow_dispatch:
 
 permissions:
-  contents: write          # needed to push bundle branch + main pointer bump
+  contents: write # needed to push bundle branch + main pointer bump
 
 jobs:
   build:
@@ -24,7 +24,7 @@ jobs:
         with:
           ref: main
           submodules: true
-          fetch-depth: 0   # full history so pointer bumps can be pushed
+          fetch-depth: 0 # full history so pointer bumps can be pushed
 
       - name: Set up Node.js 24
         uses: actions/setup-node@v4
