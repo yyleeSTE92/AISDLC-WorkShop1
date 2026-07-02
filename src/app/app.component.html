@@ -1,0 +1,62 @@
+﻿<main>
+  <header>
+    <h1>&#9986; Snip</h1>
+    <p>Tiny URL shortener</p>
+  </header>
+
+  <section>
+    <h2>Shorten a URL</h2>
+    <form (ngSubmit)="submit()" class="shorten-form">
+      <input
+        type="url"
+        [(ngModel)]="inputUrl"
+        name="url"
+        placeholder="https://example.com/long/path"
+        [disabled]="submitting()"
+        required
+      />
+      <button type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Shortening...' : 'Shorten' }}
+      </button>
+    </form>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+
+    @if (newLink(); as link) {
+      <div class="result">
+        <span>Short link:</span>
+        <a [href]="link.shortUrl" target="_blank" rel="noopener">{{ link.shortUrl }}</a>
+      </div>
+    }
+  </section>
+
+  <section>
+    <h2>All links</h2>
+    @if (links().length === 0) {
+      <p class="empty">No links yet.</p>
+    } @else {
+      <table>
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Original URL</th>
+            <th>Hits</th>
+            <th>Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (link of links(); track link.code) {
+            <tr>
+              <td><a [href]="link.shortUrl" target="_blank" rel="noopener">{{ link.code }}</a></td>
+              <td class="col-url"><a [href]="link.url" target="_blank" rel="noopener noreferrer">{{ link.url }}</a></td>
+              <td>{{ link.hits }}</td>
+              <td>{{ link.createdAt | date:'short' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</main>
