@@ -1,11 +1,7 @@
-﻿*, *::before, *::after { box-sizing: border-box; }
-
-main {
+﻿main {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem 1rem;
-  font-family: system-ui, sans-serif;
-  color: #222;
 }
 
 header { margin-bottom: 2rem; }
