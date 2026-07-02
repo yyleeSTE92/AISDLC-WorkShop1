@@ -7,7 +7,10 @@ and is wired into this superproject as a Git submodule.
 snip-demo/          ← superproject (main branch, this file)
 ├── backend/        ← submodule → branch: backend  (Bun server, zero deps)
 ├── frontend/       ← submodule → branch: frontend (Angular 19 SPA)
-└── cli/            ← submodule → branch: cli      (Node.js CLI, zero deps)
+├── cli/            ← submodule → branch: cli      (Node.js CLI, zero deps)
+├── bundle/         ← submodule → branch: bundle   (GENERATED — do not edit)
+└── scripts/
+    └── build-bundle.mjs  ← assembles bundle/ from the three source layers
 ```
 
 ---
@@ -139,6 +142,36 @@ snip add <url>    Shorten a URL, print the short link
 snip ls           List all shortened links (aligned table)
 snip open <code>  Open the destination URL in the OS browser
 snip help         Show this help
+```
+
+---
+
+## Release bundle (`bundle/` submodule)
+
+The `bundle` branch is **generated output** — never edit it by hand.
+It is assembled by `scripts/build-bundle.mjs`, which:
+
+1. Updates backend / frontend / cli submodules to their remote branch tips
+2. Builds the Angular SPA (`npm install` + `ng build`)
+3. Copies `server.js`, `cli.js`, and the SPA output into `bundle/`
+4. Writes `.env` (`PUBLIC_DIR=./public`), `package.json`, `Dockerfile`,
+   `.dockerignore`, and `railway.json`
+5. Commits inside `bundle/` and bumps the superproject pointer — each step is
+   guarded so the script is a **safe no-op** when nothing changed
+
+```bash
+# from the superproject root:
+node scripts/build-bundle.mjs          # assemble + local commits (dry-run)
+node scripts/build-bundle.mjs --push   # assemble + commit + push to origin
+```
+
+The assembled bundle can be deployed directly:
+
+```bash
+cd bundle
+bun start                              # http://localhost:3000 (serves SPA + API)
+# or docker build -t snip . && docker run -p 3000:3000 snip
+# or push to Railway (railway.json selects the Dockerfile builder)
 ```
 
 ---
