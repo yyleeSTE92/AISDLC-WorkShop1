@@ -1,0 +1,45 @@
+name: Build bundle
+
+# NOTE: no `push` trigger is used here.
+# GitHub evaluates workflow files from the branch that received the push.
+# This file only exists on `main`, so a push to backend/frontend/cli would
+# never find it — those branches don't contain .github/workflows/ at all.
+# The hourly schedule is the right mechanism to catch upstream changes.
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # every hour at :00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write          # needed to push bundle branch + main pointer bump
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main with submodules
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          submodules: true
+          fetch-depth: 0   # full history so pointer bumps can be pushed
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Configure git identity and credentials
+        run: |
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # Rewrite all github.com HTTPS URLs to include the token so that
+          # git push works inside the submodule folders as well as the superproject.
+          git config --global \
+            url."https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf \
+            "https://github.com/"
+
+      - name: Build and push bundle
+        run: node scripts/build-bundle.mjs --push
